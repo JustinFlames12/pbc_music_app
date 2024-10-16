@@ -1,0 +1,15 @@
+NOTE: Change cmd prompt to 'wsl' and be in same directory as project before starting
+
+1) buildozer init
+
+NOTE: Make revisions/edits in the buildozer.spec file as necessary (i.e. changing the 'title', 'package name'; adding libraries to application requirements; adding name of png file to presplash and icon filename section, changing application versioning number)
+
+2) buildozer -v android debug
+
+OPTIONAL (ONLY FOR DEBUGGING)
+
+NOTE: In windows cmd, cd to directory that has adb.exe. Then plug phone into PC and open the app on the phone
+
+1) adb logcat
+
+NOTE: The command above should track all outputs from the phone and the app
