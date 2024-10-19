@@ -13,3 +13,13 @@ NOTE: In windows cmd, cd to directory that has adb.exe. Then plug phone into PC 
 1) adb logcat
 
 NOTE: The command above should track all outputs from the phone and the app
+
+Troubleshooting:
+
+For errors regarding "gradle", try doing the following:
+
+1) Add the following lines to the gradle.tmpl.properties file located in the .buildozer directory (or its descendants):
+    org.gradle.jvmargs=-Xms512m -Xmx4g
+    org.gradle.caching=true
+
+2) In the build.tmpl.gradle file, try removing the jcenter() lines and replace them with mavenCentral().
