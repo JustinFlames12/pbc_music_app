@@ -3,6 +3,7 @@ from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.dropdown import DropDown
 from kivy.core.window import Window
 from kivy.uix.actionbar import ActionBar
@@ -36,7 +37,10 @@ class MusicApp(App):
         # create variables
         self.current_song = ""
         self.current_song_prompt = Label(text = f"Current song:\n{self.current_song}", color = (0.2, 0.2, 0.2, 1))
-        self.first_layout = GridLayout(cols = 2)
+        self.main_layout = BoxLayout(orientation="vertical")
+        self.first_layout = GridLayout(cols = 2, size_hint_y = 0.3)
+        self.second_layout = BoxLayout(size_hint_y = 0.7)
+        self.play_control_layout = GridLayout(cols = 2, size_hint_y = 0.4)
         self.play_button = Button(text = 'Play', background_color = button_clr, on_release = self.on_off_cycle)
         self.play_button.disabled = True
 
@@ -48,7 +52,7 @@ class MusicApp(App):
                 # When adding widgets, we need to specify the height manually
                 # (disabling the size_hint_y) so the dropdown can calculate
                 # the area it needs.
-                self.song_btn = Button(text=song, size_hint_y=None, height=30)
+                self.song_btn = Button(text=song[:-4], size_hint_y=None, height=30)
                 # for each button, attach a callback that will call the select() method
                 # on the dropdown. We'll pass the text of the button as the data of the
                 # selection.
@@ -60,7 +64,7 @@ class MusicApp(App):
                 # When adding widgets, we need to specify the height manually
                 # (disabling the size_hint_y) so the dropdown can calculate
                 # the area it needs.
-                self.song_btn = Button(text=song, size_hint_y=None, height=30)
+                self.song_btn = Button(text=song[:-4], size_hint_y=None, height=30)
                 # for each button, attach a callback that will call the select() method
                 # on the dropdown. We'll pass the text of the button as the data of the
                 # selection.
@@ -82,11 +86,19 @@ class MusicApp(App):
         self.dropdown.bind(on_select=lambda instance, x: setattr(self.mainbutton, 'text', x))
         self.stop_button = Button(text='Stop', background_color = button_clr, on_release = self.on_off_cycle)
         self.stop_button.disabled = True
+
+        self.play_control_layout.add_widget(self.play_button)
+        self.play_control_layout.add_widget(self.stop_button)
         self.first_layout.add_widget(self.current_song_prompt)
-        self.first_layout.add_widget(self.play_button)
-        self.first_layout.add_widget(self.mainbutton)
-        self.first_layout.add_widget(self.stop_button)
-        return self.first_layout
+        self.first_layout.add_widget(self.play_control_layout)
+        # self.first_layout.add_widget(self.play_button)
+        self.second_layout.add_widget(self.mainbutton)
+
+        self.main_layout.add_widget(self.first_layout)
+        self.main_layout.add_widget(self.second_layout)
+        # self.first_layout.add_widget(self.stop_button)
+        # return self.first_layout
+        return self.main_layout
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -119,10 +131,10 @@ class MusicApp(App):
         self.stop_button.disabled = False
         self.play_button.disabled = True
         if platform != 'android':
-            self.sound = SoundLoader.load(f".\soundtrack\{text}")
+            self.sound = SoundLoader.load(f".\soundtrack\{text}.wav")
             self.sound.play()
         else:
-            self.sound = SoundLoader.load(f"soundtrack/{text}")
+            self.sound = SoundLoader.load(f"soundtrack/{text}.wav")
             self.sound.play()
 
 if __name__ == '__main__':
