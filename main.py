@@ -18,7 +18,7 @@ try:
     from android.permissions import request_permissions, Permission
     from android.storage import primary_external_storage_path
     request_permissions([
-        Permission.READ_MEDIA_AUDIO,
+        # Permission.READ_MEDIA_AUDIO,
         # Permission.INTERNET,
         Permission.WRITE_EXTERNAL_STORAGE, 
         Permission.READ_EXTERNAL_STORAGE
@@ -44,15 +44,35 @@ class MusicApp(App):
         self.play_button = Button(text = 'Play', background_color = button_clr, on_release = self.on_off_cycle)
         self.play_button.disabled = True
 
+        if platform == 'ios':
+            if platform == "ios":
+                app = App.get_running_app()
+                self.ios_user_data_dir = app.user_data_dir
+                self.ios_dir = app.directory
+                print(f'iOS User Data Directory: {self.ios_user_data_dir}')
+                print(f"iOS App Directory : {self.ios_dir}")
+
         # create a dropdown with 10 buttons
         self.dropdown = DropDown()
         # for index in range(10):
-        if platform != 'android':
+        if platform == 'win':
             for song in os.listdir('.\soundtrack'):
                 # When adding widgets, we need to specify the height manually
                 # (disabling the size_hint_y) so the dropdown can calculate
                 # the area it needs.
                 self.song_btn = Button(text=song[:-4], size_hint_y=None, height=30)
+                # for each button, attach a callback that will call the select() method
+                # on the dropdown. We'll pass the text of the button as the data of the
+                # selection.
+                self.song_btn.bind(on_release=lambda btn: self.change_song(btn, btn.text))
+                # then add the button inside the dropdown
+                self.dropdown.add_widget(self.song_btn)
+        elif platform == 'ios':
+            for song in os.listdir(self.ios_dir + '/soundtrack'):
+                # When adding widgets, we need to specify the height manually
+                # (disabling the size_hint_y) so the dropdown can calculate
+                # the area it needs.
+                self.song_btn = Button(text=song[:-4], size_hint_y=None, height=100)
                 # for each button, attach a callback that will call the select() method
                 # on the dropdown. We'll pass the text of the button as the data of the
                 # selection.
@@ -73,7 +93,11 @@ class MusicApp(App):
                 self.dropdown.add_widget(self.song_btn)
 
         # create a big main button
-        self.mainbutton = Button(text='All songs', size_hint=(1, None), background_color = button_clr)
+        if platform == 'ios':
+            self.mainbutton = Button(text='All songs', size_hint=(1, None), 
+                            background_color = button_clr, height = 200)
+        else:
+            self.mainbutton = Button(text='All songs', size_hint=(1, None), background_color = button_clr)
 
         # show the dropdown menu when the main button is released
         # note: all the bind() calls pass the instance of the caller (here, the
@@ -130,8 +154,11 @@ class MusicApp(App):
         #     self.play_button.disabled = True
         self.stop_button.disabled = False
         self.play_button.disabled = True
-        if platform != 'android':
+        if platform == 'win':
             self.sound = SoundLoader.load(f".\soundtrack\{text}.wav")
+            self.sound.play()
+        elif platform == 'ios':
+            self.sound = SoundLoader.load(f"{self.ios_dir}/soundtrack/{text}.wav")
             self.sound.play()
         else:
             self.sound = SoundLoader.load(f"soundtrack/{text}.wav")
